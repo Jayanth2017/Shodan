@@ -1,0 +1,51 @@
+#about {
+    position: relative;
+    padding: 6rem 2rem;
+    background: #fafafa;
+    border-radius: 0;
+}
+#about .about-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: 0;
+}
+#about .about-bg .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    animation: orbFloat 20s ease-in-out infinite alternate;
+}
+#about .about-bg .orb1 { width: 400px; height: 400px; background: #d4af37; top: -100px; right: -100px; }
+#about .about-bg .orb2 { width: 300px; height: 300px; background: #d4af37; bottom: -80px; left: -80px; animation-delay: -7s; }
+#about .about-bg .orb3 { width: 200px; height: 200px; background: #d4af37; top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -14s; opacity: 0.06; }
+@keyframes orbFloat {
+    0% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(10px, -10px) scale(1.05); }
+}
+#about .about-content {
+    position: relative;
+    z-index: 1;
+    max-width: 780px;
+    margin: 0 auto;
+    text-align: center;
+}
+#about .about-content h2 { font-size: 2.8rem; font-weight: 700; margin-bottom: 0.4rem; }
+#about .about-content .sub {
+    font-size: 1.1rem;
+    color: #d4af37;
+    font-weight: 500;
+    margin-bottom: 1.8rem;
+    letter-spacing: 0.5px;
+}
+#about .about-content p {
+    font-size: 1.05rem;
+    line-height: 2;
+    color: #444;
+    max-width: 680px;
+    margin: 0 auto;
+}

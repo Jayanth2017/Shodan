@@ -1,0 +1,174 @@
+#home {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 70px;
+    gap: 3rem;
+    flex-wrap: nowrap;
+}
+.home-left {
+    flex: 1 1 0;
+    animation: slideInLeft 1s ease-out;
+}
+.home-left .badge {
+    display: inline-block;
+    background: rgba(212, 175, 55, 0.12);
+    color: #d4af37;
+    padding: 0.3rem 1rem;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 1.2rem;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+.home-left h1 {
+    font-size: 3.8rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #0d0d0d;
+}
+.home-left h1 .gold { color: #d4af37; }
+.home-left .title {
+    font-size: 1.2rem;
+    color: #555;
+    margin: 0.8rem 0 1.2rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+.home-left .desc {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.8;
+    max-width: 520px;
+    margin-bottom: 2rem;
+}
+.home-btns {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+.btn-primary {
+    background: #d4af37;
+    color: #0d0d0d;
+    padding: 0.7rem 2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-primary:hover {
+    background: #c19b2e;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(212, 175, 55, 0.3);
+}
+.btn-outline {
+    background: transparent;
+    color: #0d0d0d;
+    padding: 0.7rem 2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 2px solid #0d0d0d;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-outline:hover {
+    background: #0d0d0d;
+    color: #fff;
+    transform: translateY(-2px);
+}
+.social-icons {
+    display: flex;
+    gap: 1.2rem;
+    margin-top: 0.5rem;
+}
+.social-icons a {
+    color: #0d0d0d;
+    font-size: 1.6rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.social-icons a:hover {
+    color: #d4af37;
+    transform: translateY(-3px) scale(1.1);
+}
+
+/* RIGHT SIDE */
+.home-right {
+    flex: 1 1 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-height: 420px;
+}
+.monitor-wrap {
+    width: 100%;
+    max-width: 560px;
+    aspect-ratio: 16/10;
+    background: #0a0a0a;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), inset 0 0 60px rgba(212, 175, 55, 0.03);
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    position: relative;
+}
+.monitor-screen {
+    width: 100%;
+    height: 100%;
+    background: #0d1117;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.monitor-screen canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+.monitor-stand {
+    width: 60px;
+    height: 20px;
+    background: #1a1a1a;
+    margin: 0 auto;
+    border-radius: 0 0 8px 8px;
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    border-top: none;
+}
+.monitor-label {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(212, 175, 55, 0.2);
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    font-weight: 300;
+    text-transform: uppercase;
+}
+@keyframes slideInLeft {
+    0% { opacity: 0; transform: translateX(-60px); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+@media (max-width: 768px) {
+    #home { flex-direction: column; padding-top: 90px; gap: 2rem; flex-wrap: nowrap; }
+    .home-left h1 { font-size: 2.6rem; }
+    .home-right { min-height: 300px; width: 100%; justify-content: center; }
+    .monitor-wrap { max-width: 100%; }
+}
+@media (max-width: 480px) {
+    .home-btns { width: 100%; }
+    .btn-primary, .btn-outline { width: 100%; text-align: center; padding: 0.8rem 1rem; }
+}

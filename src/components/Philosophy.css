@@ -1,0 +1,34 @@
+#trading-philosophy { background: #fafafa; border-radius: 0; padding: 5rem 2rem; }
+.philosophy-wrap { display: flex; gap: 4rem; align-items: center; flex-wrap: wrap; }
+.philosophy-img {
+    flex: 1 1 40%;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #e8e8e8;
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    position: relative;
+    min-height: 280px;
+}
+.philosophy-img .placeholder-icon { font-size: 5rem; opacity: 0.15; color: #d4af37; }
+.philosophy-content { flex: 1 1 50%; }
+.philosophy-content h2 { font-size: 2.4rem; font-weight: 700; margin-bottom: 0.3rem; }
+.philosophy-content .sub { color: #d4af37; font-weight: 500; margin-bottom: 1.2rem; font-size: 1rem; }
+.philosophy-content .desc { color: #555; line-height: 1.8; margin-bottom: 1.5rem; font-size: 1rem; }
+.philosophy-list { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+.philosophy-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1rem;
+    color: #1a1a1a;
+    font-weight: 500;
+}
+.philosophy-list li .icon { color: #d4af37; font-size: 1.3rem; flex-shrink: 0; }
+@media (max-width: 768px) {
+    .philosophy-wrap { flex-direction: column; }
+    .philosophy-img { width: 100%; flex: none; }
+}

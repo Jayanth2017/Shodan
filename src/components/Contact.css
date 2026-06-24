@@ -1,0 +1,65 @@
+#contact {
+    padding: 5rem 2rem;
+    position: relative;
+    background: #fafafa;
+    border-radius: 0;
+    overflow: hidden;
+}
+#contact .contact-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.03"><circle cx="20" cy="20" r="40" fill="%23d4af37"/><circle cx="80" cy="80" r="50" fill="%23d4af37"/></svg>') no-repeat center/cover;
+    opacity: 0.4;
+}
+#contact .contact-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+}
+#contact h2 { font-size: 2.8rem; font-weight: 700; }
+#contact .sub { color: #666; margin-bottom: 2.5rem; font-size: 1.05rem; }
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+.contact-form input,
+.contact-form textarea {
+    padding: 0.9rem 1.2rem;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: #fff;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    width: 100%;
+}
+.contact-form input:focus,
+.contact-form textarea:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.08);
+}
+.contact-form textarea { min-height: 130px; resize: vertical; }
+.contact-form button {
+    background: #d4af37;
+    color: #0d0d0d;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+.contact-form button:hover {
+    background: #c19b2e;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(212, 175, 55, 0.25);
+}
