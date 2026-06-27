@@ -4,11 +4,11 @@
     align-items: center;
     padding-top: 70px;
     gap: 3rem;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
 }
 .home-left {
-    flex: 1 1 0;
-    animation: slideInLeft 1s ease-out;
+    flex: 1 1 45%;
+    animation: slideInLeft 1.7s ease-out;
 }
 .home-left .badge {
     display: inline-block;
@@ -92,7 +92,6 @@
 }
 .social-icons a {
     color: #0d0d0d;
-    font-size: 1.6rem;
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
@@ -103,17 +102,20 @@
     transform: translateY(-3px) scale(1.1);
 }
 
-/* RIGHT SIDE */
+/* HOME RIGHT - Monitor */
 .home-right {
-    flex: 1 1 0;
+    flex: 1 1 45%;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
     min-height: 420px;
 }
+.home-right{ flex: 1 1 45%;
+    animation:  2s ease-out;
+}
 .monitor-wrap {
     width: 100%;
-    max-width: 560px;
+    max-width: 600px;
     aspect-ratio: 16/10;
     background: #0a0a0a;
     border-radius: 16px;
@@ -121,11 +123,20 @@
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), inset 0 0 60px rgba(212, 175, 55, 0.03);
     border: 1px solid rgba(212, 175, 55, 0.15);
     position: relative;
+    /* Add a subtle glow transition for the 3D effect */
+    transition: box-shadow 0.3s ease;
 }
+
+/* Glow enhancement when hovered (3D trigger) */
+.monitor-wrap:hover {
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 60px rgba(212, 175, 55, 0.15);
+    border-color: #d4af37;
+}
+
 .monitor-screen {
     width: 100%;
     height: 100%;
-    background: #0d1117;
+    background: #0f141a;
     border-radius: 8px;
     overflow: hidden;
     position: relative;
@@ -149,26 +160,27 @@
 }
 .monitor-label {
     position: absolute;
-    bottom: 20px;
+    bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
-    color: rgba(212, 175, 55, 0.2);
+    color: rgba(212, 175, 55, 0.15);
     font-size: 0.7rem;
-    letter-spacing: 2px;
-    font-weight: 300;
+    letter-spacing: 3px;
+    font-weight: 400;
     text-transform: uppercase;
+    background: rgba(0,0,0,0.6);
+    padding: 4px 12px;
+    border-radius: 12px;
+    pointer-events: none;
 }
 @keyframes slideInLeft {
     0% { opacity: 0; transform: translateX(-60px); }
     100% { opacity: 1; transform: translateX(0); }
 }
+
 @media (max-width: 768px) {
-    #home { flex-direction: column; padding-top: 90px; gap: 2rem; flex-wrap: nowrap; }
+    #home { flex-direction: column; padding-top: 90px; gap: 2rem; }
     .home-left h1 { font-size: 2.6rem; }
-    .home-right { min-height: 300px; width: 100%; justify-content: center; }
+    .home-right { min-height: 300px; width: 100%; }
     .monitor-wrap { max-width: 100%; }
-}
-@media (max-width: 480px) {
-    .home-btns { width: 100%; }
-    .btn-primary, .btn-outline { width: 100%; text-align: center; padding: 0.8rem 1rem; }
 }

@@ -1,47 +1,149 @@
-#journey { background: #fff; padding: 5rem 2rem; }
-.timeline {
-    position: relative;
-    max-width: 700px;
-    margin: 3rem auto 0;
-    padding-left: 3rem;
+#journey {
+  background: #ffffff;
+  padding: 5rem 2rem;
 }
-.timeline::before {
-    content: '';
-    position: absolute;
-    left: 8px;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: #e0e0e0;
-    border-radius: 4px;
-    overflow: hidden;
+.section-heading, .section-sub { text-align: center; }
+.section-sub { margin: 0 auto 3rem; color: #666; }
+
+.timeline-container {
+  position: relative;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
+/* ----- CENTRAL LINE ----- */
+.timeline-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  background: #e0e0e0;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+/* ----- GOLD FILL (Moves UP & DOWN smoothly) ----- */
+.timeline-fill {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 3px;
+  transform: translateX(-60%);
+  height: 0%;
+  background: #d4af37;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.7), 0 0 40px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.3);
+  /* Smooth ease-out makes it feel premium when scrolling both up and down */
+  transition: height 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 1;
+}
+
+/* ----- ITEMS ----- */
 .timeline-item {
-    position: relative;
-    padding: 0.8rem 0 1.8rem 2rem;
-    opacity: 0;
-    transform: translateX(20px);
-    transition: all 0.7s ease;
+  display: flex;
+  width: 100%;
+  margin-bottom: 4.5rem;
+  position: relative;
+  z-index: 2;
+  align-items: flex-start;
 }
-.timeline-item.visible { opacity: 1; transform: translateX(0); }
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    left: -24px;
-    top: 16px;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: #d4af37;
-    border: 3px solid #fff;
-    box-shadow: 0 0 0 3px #d4af37;
-    z-index: 1;
-    transition: all 0.4s ease;
+.timeline-item.left-align { flex-direction: row; }
+.timeline-item.right-align { flex-direction: row-reverse; }
+
+.text-col {
+  width: 42%;
+  padding: 0 2rem;
+  text-align: left;
 }
-.timeline-item .year { font-weight: 700; font-size: 1.1rem; color: #d4af37; }
-.timeline-item .label { font-size: 1rem; color: #1a1a1a; font-weight: 500; }
+.timeline-item.left-align .text-col { text-align: right; }
+.timeline-item.right-align .text-col { text-align: left; }
+
+.year-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #888;
+  margin-bottom: 0.25rem;
+}
+.item-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0d0d0d;
+  margin-bottom: 0.5rem;
+}
+.item-desc {
+  font-size: 0.95rem;
+  color: #666;
+  line-height: 1.7;
+}
+
+/* ----- NODES (ICONS) ----- */
+.node-col {
+  width: 16%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 4px;
+}
+.node-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #d0d0d0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Silky smooth transition for scaling & coloring when scrolling up/down */
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 0 0 rgba(212, 175, 55, 0);
+}
+.node-icon {
+  font-size: 1.4rem;
+  color: #555555;
+  transition: color 0.35s ease;
+}
+
+/* ----- ACTIVE STATE (Triggered when scrolling down/up) ----- */
+.node-circle.active {
+  border-color: #d4af37;
+  background: #d4af37;
+  transform: scale(1); /* Pops gently when the line passes */
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.5); /* Beautiful glow */
+}
+.node-circle.active .node-icon {
+  color: #ffffff; /* Turns white inside gold */
+}
+
+/* ----- MISSION ----- */
+.mission-block {
+  margin-top: 1rem;
+  padding: 2rem 2.5rem;
+  background: #fafafa;
+  border-radius: 16px;
+  border-left: 4px solid #d4af37;
+  max-width: 600px;
+  text-align: left;
+  position: relative;
+  z-index: 1;
+}
+.mission-block h4 { font-size: 1.1rem; font-weight: 700; color: #0d0d0d; margin-bottom: 0.5rem; }
+.mission-block p { font-size: 0.95rem; color: #444; line-height: 1.8; font-style: italic; }
+
+/* ----- RESPONSIVE ----- */
 @media (max-width: 768px) {
-    .timeline { padding-left: 2rem; }
-    .timeline-item { padding-left: 1.2rem; }
-    .timeline-item::before { left: -18px; width: 12px; height: 12px; }
+  .timeline-line, .timeline-fill { left: 20px; }
+  .timeline-item {
+    flex-direction: column !important;
+    align-items: flex-start;
+    padding-left: 60px;
+    margin-bottom: 3rem;
+  }
+  .text-col { width: 100%; padding: 0; text-align: left !important; }
+  .node-col { position: absolute; left: -5px; top: 0; width: auto; padding-top: 0; }
+  .node-circle { width: 46px; height: 46px; }
+  .mission-block { margin-left: 0; padding: 1.5rem; max-width: 100%; }
 }

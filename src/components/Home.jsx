@@ -1,5 +1,10 @@
 import { useRef, useEffect } from 'react';
-import { Camera, Send, Play } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faInstagram, 
+  faTelegram, 
+  faYoutube 
+} from '@fortawesome/free-brands-svg-icons';
 import './Home.css';
 
 export default function Home() {
@@ -9,10 +14,46 @@ export default function Home() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    let w, h;
-    const pips = [];
-    const PIP_COUNT = 80;
 
+    let w, h;
+    // Chart data store
+    let priceData = [];
+    let animationFrameId;
+    let tickInterval;
+
+    // Initialize Fake Live Data
+    const initData = () => {
+      let price = 14192.0;
+      const data = [];
+      for (let i = 0; i < 50; i++) {
+        const change = (Math.random() - 0.5) * 8;
+        price += change;
+        const open = price;
+        const close = price + (Math.random() - 0.5) * 10;
+        const high = Math.max(open, close) + Math.random() * 4;
+        const low = Math.min(open, close) - Math.random() * 4;
+        data.push({ open, high, low, close });
+        price = close;
+      }
+      return data;
+    };
+    priceData = initData();
+
+    // Update with a new candlestick every 2 seconds (simulate live feed)
+    const addNewCandle = () => {
+      const last = priceData[priceData.length - 1];
+      const change = (Math.random() - 0.5) * 8;
+      const newClose = last.close + change;
+      priceData.push({
+        open: last.close,
+        high: Math.max(last.close, newClose) + Math.random() * 3,
+        low: Math.min(last.close, newClose) - Math.random() * 3,
+        close: newClose
+      });
+      if (priceData.length > 50) priceData.shift(); // keep last 50 candles
+    };
+
+    // Resize handler
     const resize = () => {
       const rect = canvas.parentElement.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
@@ -24,98 +65,128 @@ export default function Home() {
       canvas.style.height = rect.height + 'px';
     };
 
-    class Pip {
-      constructor() { this.reset(); }
-      reset() {
-        this.x = Math.random() * w;
-        this.y = Math.random() * h;
-        this.vx = (Math.random() - 0.5) * 0.4;
-        this.vy = (Math.random() - 0.5) * 0.4;
-        this.size = 2 + Math.random() * 3;
-        this.opacity = 0.15 + Math.random() * 0.5;
-        this.color = `hsla(${40 + Math.random()*15}, 70%, ${50 + Math.random()*30}%, ${this.opacity})`;
-      }
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        if (this.x < 0 || this.x > w) { this.vx *= -1; this.x = Math.max(0, Math.min(w, this.x)); }
-        if (this.y < 0 || this.y > h) { this.vy *= -1; this.y = Math.max(0, Math.min(h, this.y)); }
-      }
-      draw(ctx) {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-        ctx.shadowColor = 'rgba(212,175,55,0.15)';
-        ctx.shadowBlur = 12;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-    }
-
-    const init = () => {
-      resize();
-      pips.length = 0;
-      for (let i = 0; i < PIP_COUNT; i++) {
-        const p = new Pip();
-        p.x = Math.random() * w;
-        p.y = Math.random() * h;
-        pips.push(p);
-      }
-    };
-
-    const animate = () => {
+    // --- CHART DRAWING ENGINE ---
+    const drawChart = () => {
       ctx.clearRect(0, 0, w, h);
-      ctx.strokeStyle = 'rgba(212,175,55,0.03)';
+
+      // 1. Chart Margins
+      const pad = { top: 30 * (w / 500), right: 50 * (w / 500), bottom: 30 * (w / 500), left: 10 * (w / 500) };
+      const chartW = w - pad.left - pad.right;
+      const chartH = h - pad.top - pad.bottom;
+
+      // 2. Calculate Price Range
+      const allPrices = priceData.flatMap(c => [c.high, c.low]);
+      const minPrice = Math.min(...allPrices) - 1.5;
+      const maxPrice = Math.max(...allPrices) + 1.5;
+      const priceRange = maxPrice - minPrice;
+
+      const getY = (val) => pad.top + chartH - ((val - minPrice) / priceRange) * chartH;
+      const spacing = chartW / priceData.length;
+      const candleWidth = spacing * 0.7;
+
+      // 3. Draw Grid Lines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
       ctx.lineWidth = 0.5;
-      for (let x = 0; x < w; x += 40) {
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      for (let i = 0; i <= 6; i++) {
+        const y = pad.top + (i / 6) * chartH;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(w - pad.right, y);
+        ctx.stroke();
       }
-      for (let y = 0; y < h; y += 40) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      for (let i = 0; i <= 10; i++) {
+        const x = pad.left + (i / 10) * chartW;
+        ctx.beginPath();
+        ctx.moveTo(x, pad.top);
+        ctx.lineTo(x, h - pad.bottom);
+        ctx.stroke();
       }
-      pips.forEach(p => { p.update(); p.draw(ctx); });
-      for (let i = 0; i < pips.length; i++) {
-        for (let j = i + 1; j < pips.length; j++) {
-          const dx = pips[i].x - pips[j].x;
-          const dy = pips[i].y - pips[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 80) {
-            ctx.beginPath();
-            ctx.moveTo(pips[i].x, pips[i].y);
-            ctx.lineTo(pips[j].x, pips[j].y);
-            ctx.strokeStyle = `rgba(212,175,55,${0.03 * (1 - dist/80)})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
+
+      // 4. Draw Y-Axis Labels (Prices - Right Side)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.font = `600 ${10 * (w / 500)}px sans-serif`;
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      for (let i = 0; i <= 6; i++) {
+        const priceVal = maxPrice - (i / 6) * priceRange;
+        const y = pad.top + (i / 6) * chartH;
+        ctx.fillText(priceVal.toFixed(1), w - pad.right + 45, y);
       }
-      const barCount = 12;
-      for (let i = 0; i < barCount; i++) {
-        const x = (i / barCount) * w + 20;
-        const barH = 20 + Math.sin(i * 1.7 + Date.now() / 3000) * 12;
-        const y = h / 2 - barH / 2 + Math.sin(i * 2.3 + Date.now() / 4000) * 8;
-        ctx.fillStyle = i % 2 === 0 ? 'rgba(212,175,55,0.08)' : 'rgba(212,175,55,0.04)';
-        ctx.fillRect(x, y, 4, barH);
-        ctx.fillStyle = 'rgba(212,175,55,0.06)';
-        ctx.fillRect(x + 6, y + 2, 2, barH - 4);
-      }
-      requestAnimationFrame(animate);
+
+      // 5. Draw X-Axis Labels (Dates - Bottom)
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.font = `400 ${11 * (w / 500)}px sans-serif`;
+      // ctx.fillText('Mar 2026', pad.left + 15, h - pad.bottom + 6);
+      // ctx.fillText('Apr 2026', w - pad.right - 15, h - pad.bottom + 6);
+
+      // 6. Draw Candlesticks
+      priceData.forEach((c, i) => {
+        const x = pad.left + i * spacing + spacing / 2;
+        const isGreen = c.close >= c.open;
+        const color = isGreen ? '#2ecc71' : '#e74c3c'; // Green / Red
+
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = 0.8;
+
+        // Wick
+        ctx.beginPath();
+        ctx.moveTo(x, getY(c.high));
+        ctx.lineTo(x, getY(c.low));
+        ctx.stroke();
+
+        // Body
+        const top = getY(Math.max(c.open, c.close));
+        const bottom = getY(Math.min(c.open, c.close));
+        const height = Math.max(1, bottom - top);
+        ctx.fillRect(x - candleWidth / 2, top, candleWidth, height);
+      });
+
+      // 7. Top-Left Branding (GBP/USD)
+      ctx.fillStyle = '#d4af37';
+      ctx.font = `700 ${14 * (w / 500)}px sans-serif`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText('EUR/USD', pad.left + 6, pad.top + 4);
+
+      // Fake IG Logo
+      // ctx.fillStyle = '';
+      // ctx.fillRect(pad.left + 6, pad.top + 24, 24 * (w/500), 24 * (w/500));
+      // ctx.fillStyle = '#ffffff';
+      // ctx.font = `900 ${16 * (w / 500)}px sans-serif`;
+      // ctx.textAlign = 'center';
+      // ctx.textBaseline = 'middle';
+      // ctx.fillText('', pad.left + 6 + 12 * (w/500), pad.top + 24 + 12 * (w/500));
     };
 
-    init();
+    // 8. Animation Loop
+    const animate = () => {
+      drawChart();
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    resize();
+    tickInterval = setInterval(addNewCandle, 2000); // New candle every 2 seconds
     animate();
+
     const handleResize = () => resize();
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      clearInterval(tickInterval);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   return (
     <section id="home">
       <div className="home-left">
-        <div className="badge">Forex Trader & Analyst</div>
+        <div className="badge">📊 Forex Trader & Analyst</div>
         <h1>Shodhan Raj <span className="gold">S R</span></h1>
-        <p className="title">Forex Trader | Market Analyst | Content Creator</p>
+        <p className="title">Forex Trader • Market Analyst • Content Creator</p>
         <p className="desc">
           Focused on technical analysis, risk management, and trading psychology.<br />
           Helping traders understand market structure, develop discipline, and improve consistency.
@@ -125,11 +196,18 @@ export default function Home() {
           <a href="#contact" className="btn-outline">Join Course</a>
         </div>
         <div className="social-icons">
-          <a href="#" aria-label="Instagram"><Camera size={28} /></a>
-          <a href="#" aria-label="Telegram"><Send size={28} /></a>
-          <a href="#" aria-label="YouTube"><Play size={28} /></a>
+          <a href="#" aria-label="Instagram">
+            <FontAwesomeIcon icon={faInstagram} size="2x" />
+          </a>
+          <a href="#" aria-label="Telegram">
+            <FontAwesomeIcon icon={faTelegram} size="2x" />
+          </a>
+          <a href="#" aria-label="YouTube">
+            <FontAwesomeIcon icon={faYoutube} size="2x" />
+          </a>
         </div>
       </div>
+      
       <div className="home-right">
         <div className="monitor-wrap">
           <div className="monitor-screen">
