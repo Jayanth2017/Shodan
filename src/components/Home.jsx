@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faInstagram, 
@@ -9,19 +9,23 @@ import './Home.css';
 
 export default function Home() {
   const canvasRef = useRef(null);
+  const monitorRef = useRef(null);
+  
+  // 3D Hover states
+  const [tiltX, setTiltX] = useState(0);
+  const [tiltY, setTiltY] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
 
+  // --- CHART LOGIC (Same as before) ---
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-
     let w, h;
-    // Chart data store
     let priceData = [];
     let animationFrameId;
     let tickInterval;
 
-    // Initialize Fake Live Data
     const initData = () => {
       let price = 14192.0;
       const data = [];
@@ -39,7 +43,6 @@ export default function Home() {
     };
     priceData = initData();
 
-    // Update with a new candlestick every 2 seconds (simulate live feed)
     const addNewCandle = () => {
       const last = priceData[priceData.length - 1];
       const change = (Math.random() - 0.5) * 8;
@@ -50,10 +53,9 @@ export default function Home() {
         low: Math.min(last.close, newClose) - Math.random() * 3,
         close: newClose
       });
-      if (priceData.length > 50) priceData.shift(); // keep last 50 candles
+      if (priceData.length > 50) priceData.shift();
     };
 
-    // Resize handler
     const resize = () => {
       const rect = canvas.parentElement.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
@@ -65,16 +67,12 @@ export default function Home() {
       canvas.style.height = rect.height + 'px';
     };
 
-    // --- CHART DRAWING ENGINE ---
     const drawChart = () => {
       ctx.clearRect(0, 0, w, h);
-
-      // 1. Chart Margins
       const pad = { top: 30 * (w / 500), right: 50 * (w / 500), bottom: 30 * (w / 500), left: 10 * (w / 500) };
       const chartW = w - pad.left - pad.right;
       const chartH = h - pad.top - pad.bottom;
 
-      // 2. Calculate Price Range
       const allPrices = priceData.flatMap(c => [c.high, c.low]);
       const minPrice = Math.min(...allPrices) - 1.5;
       const maxPrice = Math.max(...allPrices) + 1.5;
@@ -84,91 +82,64 @@ export default function Home() {
       const spacing = chartW / priceData.length;
       const candleWidth = spacing * 0.7;
 
-      // 3. Draw Grid Lines
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
       ctx.lineWidth = 0.5;
       for (let i = 0; i <= 6; i++) {
         const y = pad.top + (i / 6) * chartH;
-        ctx.beginPath();
-        ctx.moveTo(pad.left, y);
-        ctx.lineTo(w - pad.right, y);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w - pad.right, y); ctx.stroke();
       }
       for (let i = 0; i <= 10; i++) {
         const x = pad.left + (i / 10) * chartW;
-        ctx.beginPath();
-        ctx.moveTo(x, pad.top);
-        ctx.lineTo(x, h - pad.bottom);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, h - pad.bottom); ctx.stroke();
       }
 
-      // 4. Draw Y-Axis Labels (Prices - Right Side)
       ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
       ctx.font = `600 ${10 * (w / 500)}px sans-serif`;
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
       for (let i = 0; i <= 6; i++) {
         const priceVal = maxPrice - (i / 6) * priceRange;
         const y = pad.top + (i / 6) * chartH;
         ctx.fillText(priceVal.toFixed(1), w - pad.right + 45, y);
       }
 
-      // 5. Draw X-Axis Labels (Dates - Bottom)
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-      ctx.font = `400 ${11 * (w / 500)}px sans-serif`;
-      // ctx.fillText('Mar 2026', pad.left + 15, h - pad.bottom + 6);
-      // ctx.fillText('Apr 2026', w - pad.right - 15, h - pad.bottom + 6);
+      // ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      // ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      // ctx.font = `400 ${11 * (w / 500)}px sans-serif`;
+      // ctx.fillText('Mar 2018', pad.left + 15, h - pad.bottom + 6);
+      // ctx.fillText('Apr 2018', w - pad.right - 15, h - pad.bottom + 6);
 
-      // 6. Draw Candlesticks
       priceData.forEach((c, i) => {
         const x = pad.left + i * spacing + spacing / 2;
         const isGreen = c.close >= c.open;
-        const color = isGreen ? '#2ecc71' : '#e74c3c'; // Green / Red
-
-        ctx.strokeStyle = color;
-        ctx.fillStyle = color;
-        ctx.lineWidth = 0.8;
-
-        // Wick
-        ctx.beginPath();
-        ctx.moveTo(x, getY(c.high));
-        ctx.lineTo(x, getY(c.low));
-        ctx.stroke();
-
-        // Body
+        const color = isGreen ? '#2ecc71' : '#e74c3c';
+        ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.moveTo(x, getY(c.high)); ctx.lineTo(x, getY(c.low)); ctx.stroke();
         const top = getY(Math.max(c.open, c.close));
         const bottom = getY(Math.min(c.open, c.close));
         const height = Math.max(1, bottom - top);
         ctx.fillRect(x - candleWidth / 2, top, candleWidth, height);
       });
 
-      // 7. Top-Left Branding (GBP/USD)
       ctx.fillStyle = '#d4af37';
       ctx.font = `700 ${14 * (w / 500)}px sans-serif`;
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
       ctx.fillText('EUR/USD', pad.left + 6, pad.top + 4);
-
-      // Fake IG Logo
-      // ctx.fillStyle = '';
+      
+      // ctx.fillStyle = '#E63A3A';
       // ctx.fillRect(pad.left + 6, pad.top + 24, 24 * (w/500), 24 * (w/500));
       // ctx.fillStyle = '#ffffff';
       // ctx.font = `900 ${16 * (w / 500)}px sans-serif`;
-      // ctx.textAlign = 'center';
-      // ctx.textBaseline = 'middle';
-      // ctx.fillText('', pad.left + 6 + 12 * (w/500), pad.top + 24 + 12 * (w/500));
+      // ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      // ctx.fillText('IG', pad.left + 6 + 12 * (w/500), pad.top + 24 + 12 * (w/500));
     };
 
-    // 8. Animation Loop
     const animate = () => {
       drawChart();
       animationFrameId = requestAnimationFrame(animate);
     };
 
     resize();
-    tickInterval = setInterval(addNewCandle, 2000); // New candle every 2 seconds
+    tickInterval = setInterval(addNewCandle, 2000);
     animate();
 
     const handleResize = () => resize();
@@ -181,10 +152,30 @@ export default function Home() {
     };
   }, []);
 
+  // --- 3D HOVER MOUSE EVENTS ---
+  const handleMouseMove = (e) => {
+    if (!monitorRef.current) return;
+    const rect = monitorRef.current.getBoundingClientRect();
+    // Calculate mouse position relative to the center of the monitor (-1 to 1)
+    const x = (e.clientX - rect.left) / rect.width * 2 - 1;
+    const y = (e.clientY - rect.top) / rect.height * 2 - 1;
+    
+    // Map to degrees (Max tilt ±10 degrees)
+    setTiltX(y * -10); // Y movement controls X-axis rotation
+    setTiltY(x * 10);  // X movement controls Y-axis rotation
+  };
+
+  const handleMouseEnter = () => setIsHovering(true);
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+    setTiltX(0);
+    setTiltY(0);
+  };
+
   return (
     <section id="home">
       <div className="home-left">
-        <div className="badge">📊 Forex Trader & Analyst</div>
+        <div className="badge"> Forex Trader & Analyst</div>
         <h1>Shodhan Raj <span className="gold">S R</span></h1>
         <p className="title">Forex Trader • Market Analyst • Content Creator</p>
         <p className="desc">
@@ -196,20 +187,27 @@ export default function Home() {
           <a href="#contact" className="btn-outline">Join Course</a>
         </div>
         <div className="social-icons">
-          <a href="#" aria-label="Instagram">
-            <FontAwesomeIcon icon={faInstagram} size="2x" />
-          </a>
-          <a href="#" aria-label="Telegram">
-            <FontAwesomeIcon icon={faTelegram} size="2x" />
-          </a>
-          <a href="#" aria-label="YouTube">
-            <FontAwesomeIcon icon={faYoutube} size="2x" />
-          </a>
+          <a href="#" aria-label="Instagram"><FontAwesomeIcon icon={faInstagram} size="2x" /></a>
+          <a href="#" aria-label="Telegram"><FontAwesomeIcon icon={faTelegram} size="2x" /></a>
+          <a href="#" aria-label="YouTube"><FontAwesomeIcon icon={faYoutube} size="2x" /></a>
         </div>
       </div>
       
       <div className="home-right">
-        <div className="monitor-wrap">
+        {/* The monitor wrap gets the 3D perspective and transform */}
+        <div 
+          className="monitor-wrap" 
+          ref={monitorRef}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          style={{
+            transform: isHovering 
+              ? `rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.05)` 
+              : 'rotateX(0deg) rotateY(0deg) scale(1)',
+            transition: 'transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          }}
+        >
           <div className="monitor-screen">
             <canvas ref={canvasRef} />
             <div className="monitor-label">LIVE MARKETS</div>
