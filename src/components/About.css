@@ -77,11 +77,11 @@
     #about .about-bg .orb2 { width: 150px; height: 150px; bottom: -40px; left: -40px; }
     #about .about-bg .orb3 { width: 150px; height: 150px; }
 
-    #about .about-content h2 { margin-top: 10px; font-size: 1.25rem; }
+    #about .about-content h2 { margin-top: 10px; font-size: 1.50rem; }
     #about .about-content .sub { font-size: 0.95rem; margin-bottom: 1.2rem; }
     #about .about-content p {
         font-size: 0.90rem;
         line-height: 1.8;
-        text-align: left; /* More readable on small screens */
+        text-align: center; /* More readable on small screens */
     }
 }
