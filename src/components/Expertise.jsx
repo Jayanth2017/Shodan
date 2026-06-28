@@ -13,18 +13,32 @@ export default function Expertise() {
 
   return (
     <section id="expertise">
-      <h2 className="section-heading">What I <span className="gold">Focus On</span></h2>
-      <p className="section-sub">Core areas of expertise that drive consistent trading performance.</p>
-      <div className="expertise-grid">
-        {cards.map((card, i) => (
-          <div className="expertise-card" key={i}>
-            <div className="img-frame">
-              <div className="placeholder-icon">{card.icon}</div>
+      {/* Decorative animated background orbs */}
+      <div className="expertise-bg">
+        <div className="exp-orb exp-orb1"></div>
+        <div className="exp-orb exp-orb2"></div>
+      </div>
+
+      <div className="expertise-container">
+        <h2 className="section-heading">What I <span className="gold">Focus On</span></h2>
+        <p className="section-sub">Core areas of expertise that drive consistent trading performance.</p>
+        
+        <div className="expertise-grid">
+          {cards.map((card, i) => (
+            <div className="expertise-card" key={i}>
+              {/* 3D Icon Wrapper */}
+              <div className="icon-3d-wrapper">
+                <div className="icon-3d">
+                  <div className="icon-inner">
+                    {card.icon}
+                  </div>
+                </div>
+              </div>
+              <h4>{card.title}</h4>
+              <p>{card.desc}</p>
             </div>
-            <h4>{card.title}</h4>
-            <p>{card.desc}</p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );
